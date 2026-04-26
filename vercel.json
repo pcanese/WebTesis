@@ -1,0 +1,5 @@
+{
+    "rewrites": [
+          { "source": "/", "destination": "/turnook-landing-v2.html" }
+    ]
+}
