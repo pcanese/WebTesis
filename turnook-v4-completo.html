@@ -1086,27 +1086,27 @@ body.dark .step-num,body.dark .feat-card{background:var(--surface);border-color:
 <script>
 /* ═══ DATA ═══ */
 const SPECS=[
-  {id:'cardio',   n:'Cardiología',    c:5,  ico:'heart'},
-  {id:'clinica',  n:'Clínica Médica', c:8,  ico:'steth'},
-  {id:'neuro',    n:'Neurología',     c:3,  ico:'brain'},
-  {id:'traumato', n:'Traumatología',  c:4,  ico:'bone'},
-  {id:'dermato',  n:'Dermatología',   c:6,  ico:'skin'},
-  {id:'oftalmo',  n:'Oftalmología',   c:4,  ico:'eye'},
-  {id:'gineco',   n:'Ginecología',    c:5,  ico:'cross'},
-  {id:'pediatria',n:'Pediatría',      c:7,  ico:'star'},
+  {id:'cardio',   n:'Cardiología',    ico:'heart'},
+  {id:'clinica',  n:'Clínica Médica', ico:'steth'},
+  {id:'neuro',    n:'Neurología',     ico:'brain'},
+  {id:'traumato', n:'Traumatología',  ico:'bone'},
+  {id:'dermato',  n:'Dermatología',   ico:'skin'},
+  {id:'oftalmo',  n:'Oftalmología',   ico:'eye'},
+  {id:'gineco',   n:'Ginecología',    ico:'cross'},
+  {id:'pediatria',n:'Pediatría',      ico:'star'},
 ];
 
 const DOCS={
-  cardio:  [{id:'d1',n:'Dra. Laura Sánchez',  sp:'Cardiología',    plans:['OSDE','Swiss Medical'],r:4.9,nx:'Hoy',      ini:'LS'},
-            {id:'d2',n:'Dr. Roberto Fernández',sp:'Cardiología',    plans:['Galeno','Particular'], r:4.7,nx:'Mañana',   ini:'RF'}],
-  clinica: [{id:'d3',n:'Dr. Nicolás Martínez',sp:'Clínica Médica', plans:['OSDE','Swiss Medical','Galeno'],r:4.8,nx:'Hoy',ini:'NM'},
-            {id:'d4',n:'Dra. Valeria Ruiz',    sp:'Clínica Médica', plans:['Medicus','OSDE'],      r:4.6,nx:'Hoy',      ini:'VR'}],
-  neuro:   [{id:'d5',n:'Dra. Sofía Gómez',    sp:'Neurología',     plans:['Swiss Medical','OSDE'],r:5.0,nx:'Miércoles',ini:'SG'}],
-  traumato:[{id:'d6',n:'Dr. Andrés Peralta',  sp:'Traumatología',  plans:['OSDE','Galeno'],       r:4.8,nx:'Hoy',      ini:'AP'}],
-  dermato: [{id:'d7',n:'Dr. Martín Vargas',   sp:'Dermatología',   plans:['OSDE','Medicus'],      r:4.9,nx:'Mañana',   ini:'MV'}],
-  oftalmo: [{id:'d8',n:'Dra. Jimena Ibáñez',  sp:'Oftalmología',   plans:['Swiss Medical','OSDE'],r:4.8,nx:'Hoy',      ini:'JI'}],
-  gineco:  [{id:'d9',n:'Dra. Carolina Muñiz', sp:'Ginecología',    plans:['OSDE','Galeno'],       r:4.9,nx:'Mañana',   ini:'CM'}],
-  pediatria:[{id:'d10',n:'Dr. Sebastián Ríos',sp:'Pediatría',      plans:['Todas'],               r:4.9,nx:'Hoy',      ini:'SR'}],
+  cardio:  [{id:'d1',n:'Dra. Laura Sánchez',  sp:'Cardiología',    plans:['OSDE','Swiss Medical'],r:4.9,ini:'LS'},
+            {id:'d2',n:'Dr. Roberto Fernández',sp:'Cardiología',    plans:['Galeno','Particular'], r:4.7,ini:'RF'}],
+  clinica: [{id:'d3',n:'Dr. Nicolás Martínez',sp:'Clínica Médica', plans:['OSDE','Swiss Medical','Galeno'],r:4.8,ini:'NM'},
+            {id:'d4',n:'Dra. Valeria Ruiz',    sp:'Clínica Médica', plans:['Medicus','OSDE'],      r:4.6,ini:'VR'}],
+  neuro:   [{id:'d5',n:'Dra. Sofía Gómez',    sp:'Neurología',     plans:['Swiss Medical','OSDE'],r:5.0,ini:'SG'}],
+  traumato:[{id:'d6',n:'Dr. Andrés Peralta',  sp:'Traumatología',  plans:['OSDE','Galeno'],       r:4.8,ini:'AP'}],
+  dermato: [{id:'d7',n:'Dr. Martín Vargas',   sp:'Dermatología',   plans:['OSDE','Medicus'],      r:4.9,ini:'MV'}],
+  oftalmo: [{id:'d8',n:'Dra. Jimena Ibáñez',  sp:'Oftalmología',   plans:['Swiss Medical','OSDE'],r:4.8,ini:'JI'}],
+  gineco:  [{id:'d9',n:'Dra. Carolina Muñiz', sp:'Ginecología',    plans:['OSDE','Galeno'],       r:4.9,ini:'CM'}],
+  pediatria:[{id:'d10',n:'Dr. Sebastián Ríos',sp:'Pediatría',      plans:['Todas'],               r:4.9,ini:'SR'}],
 };
 
 const CT={
@@ -1133,8 +1133,6 @@ const ICONS={
 
 /* 9:00-17:00 every 30 min */
 const ALL_SLOTS=['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00'];
-const AVAIL_DAYS=[1,2,4,5,7,8,9,11,14,15,16,18,21,22];
-const TAKEN=['09:00','11:30','14:30'];
 
 const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DAYS_S=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -1155,20 +1153,37 @@ const CLINIC_ADDRESSES=[
   {n:'Sanatorio Trinidad',a:'Cerviño 4720, CABA',map:'https://maps.google.com/?q=Cervino+4720+CABA'},
 ];
 function augmentDocs(){
+  const today=startOfDay(new Date());
+  const todayKey=isoD(today);
+  const tomorrow=new Date(today);tomorrow.setDate(today.getDate()+1);
+  const tomorrowKey=isoD(tomorrow);
   let i=0;
   Object.values(DOCS).flat().forEach(d=>{
-    // semilla determinística por id
     const seed=d.id.charCodeAt(d.id.length-1);
     d.reviews=40+(seed*17)%180;
     d.clinic=CLINIC_ADDRESSES[i%CLINIC_ADDRESSES.length];
     i++;
+    /* Calcular próximo turno disponible real desde agendasByDoc */
+    const agenda=agendasByDoc[d.id]||{};
+    const sortedKeys=Object.keys(agenda).sort();
+    d.nx='Sin turnos';
+    for(const key of sortedKeys){
+      const dt=new Date(key+'T12:00');
+      if(startOfDay(dt)<today)continue;
+      const hasAvail=(agenda[key]||[]).some(s=>s.s==='available');
+      if(!hasAvail)continue;
+      if(key===todayKey){d.nx='Hoy';break;}
+      if(key===tomorrowKey){d.nx='Mañana';break;}
+      d.nx=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][dt.getDay()];
+      break;
+    }
   });
 }
 
 /* ═══ INIT ═══ */
 document.addEventListener('DOMContentLoaded',()=>{
+  buildAgendas();   /* primero agenda, para que augmentDocs calcule nx real */
   augmentDocs();
-  buildAgendas();
   renderSpecs();
   renderAdminEntry();
   initCal();
@@ -1689,6 +1704,9 @@ function doRace(winner){
 function addToAgenda(b){
   const docAgenda=agendasByDoc[b.doctorId]||aDB;
   const day=docAgenda?.[b.dayKey];if(!day)return;
+  /* Prevenir double-booking: verificar que el horario esté disponible */
+  const conflict=day.find(a=>a.t===b.time&&a.s!=='available'&&a.s!=='cancelled');
+  if(conflict){toast('Este horario ya está ocupado. Por favor elegí otro.','err');return;}
   const exact=day.find(a=>a.t===b.time&&a.s==='available');
   if(exact){exact.s='new';exact.p=b.patient;exact.pl=b.plan;exact.ct=b.ct;}
   else{day.push({t:b.time,p:b.patient,pl:b.plan,s:'new',ct:b.ct,id:Date.now()});day.sort((a,c)=>a.t.localeCompare(c.t));}
@@ -1701,12 +1719,13 @@ function addToAgenda(b){
 
 /* ═══ PATIENT - SPECIALTIES ═══ */
 function renderSpecs(){
-  document.getElementById('spec-grid').innerHTML=SPECS.map(s=>`
-    <div class="spec-card" id="sp-${s.id}" onclick="selSpec('${s.id}','${s.n}')">
+  document.getElementById('spec-grid').innerHTML=SPECS.map(s=>{
+    const count=(DOCS[s.id]||[]).length;
+    return`<div class="spec-card" id="sp-${s.id}" onclick="selSpec('${s.id}','${s.n}')">
       <div class="spec-icon">${ICONS[s.ico]}</div>
       <div class="spec-name">${s.n}</div>
-      <div class="spec-ct">${s.c} profesionales</div>
-    </div>`).join('');
+      <div class="spec-ct">${count} profesional${count!==1?'es':''}</div>
+    </div>`;}).join('');
 }
 function selSpec(id,n){
   document.querySelectorAll('.spec-card').forEach(c=>c.classList.remove('sel'));
@@ -1764,10 +1783,13 @@ function renderCal(){
   const grid=document.getElementById('cal-grid');
   grid.innerHTML=DAYS_S.map(d=>`<div class="cdl">${d}</div>`).join('');
   const fd=new Date(y,m,1).getDay(),tot=new Date(y,m+1,0).getDate(),today=new Date();
+  const docAgenda=S.doc?(agendasByDoc[S.doc]||{}):{};
   for(let i=0;i<fd;i++)grid.innerHTML+=`<div class="cd empty"></div>`;
   for(let d=1;d<=tot;d++){
     const dt=new Date(y,m,d),isPast=dt<new Date(today.getFullYear(),today.getMonth(),today.getDate());
-    const isAv=AVAIL_DAYS.includes(d)&&!isPast,isSel=S.day===d;
+    const dayKey=isoD(new Date(y,m,d));
+    const isAv=!isPast&&(docAgenda[dayKey]||[]).some(a=>a.s==='available');
+    const isSel=S.day===d;
     const cls='cd'+(isPast?' past':isSel?' chosen':isAv?' avail':' unav');
     grid.innerHTML+=`<div class="${cls}" ${(isAv||isSel)?`onclick="pickDay(${d})"`:''}>${d}</div>`;
   }
@@ -1779,9 +1801,13 @@ function nextM(){if(S.calM===11){S.calM=0;S.calY++;}else S.calM++;S.day=null;ren
 /* ═══ SLOTS ═══ */
 function renderSlots(day){
   document.getElementById('s5title').textContent=`Horarios · ${day} de ${MONTHS[S.calM]}`;
+  const dayKey=isoD(new Date(S.calY,S.calM,day));
+  const agendaSlots=(S.doc?(agendasByDoc[S.doc]||{}):{} )[dayKey]||[];
   document.getElementById('slots-grid').innerHTML=ALL_SLOTS.map(s=>{
-    const tk=TAKEN.includes(s),sel=S.slot===s;
-    return`<div class="slot${tk?' taken':sel?' sel':''}" ${!tk?`onclick="pickSlot('${s}')"`:''}>${s}${tk?'<br/><span style="font-size:.68rem">Ocupado</span>':''}</div>`;
+    const entry=agendaSlots.find(a=>a.t===s);
+    const isAvail=entry&&entry.s==='available';
+    const sel=S.slot===s;
+    return`<div class="slot${!isAvail?' taken':sel?' sel':''}" ${isAvail?`onclick="pickSlot('${s}')"`:''}>${s}${!isAvail?'<br/><span style="font-size:.68rem">Ocupado</span>':''}</div>`;
   }).join('');
 }
 function pickSlot(s){
@@ -1791,12 +1817,32 @@ function pickSlot(s){
   document.getElementById('bn5').disabled=false;
 }
 
+/* Mapa de expansión: plan base del médico → opciones visibles para el paciente */
+const PLAN_OPTIONS={
+  'OSDE':         ['OSDE 210','OSDE 410'],
+  'Swiss Medical':['Swiss Medical'],
+  'Galeno':       ['Galeno'],
+  'Medicus':      ['Medicus'],
+  'Particular':   ['Particular'],
+  'Todas':        ['OSDE 210','OSDE 410','Swiss Medical','Galeno','Medicus','Particular'],
+};
+function loadPlanOptions(){
+  const doc=Object.values(DOCS).flat().find(d=>d.id===S.doc);
+  const sel=document.getElementById('f-plan');
+  if(!sel)return;
+  const allowed=doc?(doc.plans||[]).flatMap(p=>PLAN_OPTIONS[p]||[p])
+    :Object.values(PLAN_OPTIONS).flat();
+  const unique=[...new Set(allowed)];
+  sel.innerHTML='<option value="">Seleccioná</option>'+unique.map(p=>`<option>${p}</option>`).join('');
+}
+
 /* ═══ STEPS ═══ */
 function go(n){
   if(n===2)renderDocs(S.spec);
   if(n===3)renderCT(S.spec);
+  if(n===4)renderCal();          /* re-renderizar con médico ya elegido */
   if(n===5&&S.day)renderSlots(S.day);
-  if(n===6)updSummary();
+  if(n===6){updSummary();loadPlanOptions();}
   if(n>7)return;
   S.step=n;
   document.querySelectorAll('.bsec').forEach(s=>s.classList.remove('active'));
@@ -1863,7 +1909,12 @@ function valForm(){
   showFieldError('f-last',fLast&&!validName(fLast)?'Solo letras, mínimo 2':'');
   showFieldError('f-dni',fDni.value&&!validDNI(fDni.value)?'DNI inválido (7-8 dígitos)':'');
   showFieldError('f-phone',fPhone.value&&!validPhone(fPhone.value)?'Celular inválido (incluí código de país)':'');
-  const allValid=validName(fName)&&validName(fLast)&&validDNI(fDni.value)&&validPhone(fPhone.value)&&fPlan&&(fTerms?fTerms.checked:true);
+  /* Verificar que el plan elegido sea aceptado por el médico */
+  const doc=Object.values(DOCS).flat().find(d=>d.id===S.doc);
+  const allowedPlans=doc?(doc.plans||[]).flatMap(p=>PLAN_OPTIONS[p]||[p]):[];
+  const planOk=!fPlan||allowedPlans.length===0||allowedPlans.includes(fPlan);
+  showFieldError('f-plan',fPlan&&!planOk?'Este médico no atiende con esa obra social':'');
+  const allValid=validName(fName)&&validName(fLast)&&validDNI(fDni.value)&&validPhone(fPhone.value)&&fPlan&&planOk&&(fTerms?fTerms.checked:true);
   document.getElementById('bn6').disabled=!allValid;
   if(allValid)savePatientLocal();
 }
